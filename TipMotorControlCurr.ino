@@ -37,6 +37,7 @@ void setup() {
 
   emon1.current(1, 111.1);             // Current: input pin, calibration.
   pinMode(fadePin, OUTPUT);
+  pinMode(12, INPUT_PULLUP);
   
 
   while (!Serial) {
@@ -49,32 +50,11 @@ void loop() {
 
   double Irms = emon1.calcIrms(1480);  // Calculate Irms only
   double appPower = Irms*230.0;
-
-  /*
-
-  Serial.println("255"); 
-
-  analogWrite(fadePin, 255);
-
-  delay(5000); 
-
-  Serial.println("200"); 
-
-  analogWrite(fadePin, 200);
   
-  delay(5000); 
-
-  Serial.println("150"); 
-
-  analogWrite(fadePin, 150);
-
-  delay(5000); 
-
-  Serial.println("0"); 
-
-  analogWrite(fadePin, 0);
-
-*/
+  if (digitalRead(12) == LOW )
+  {
+    Serial.println("Button has been pressed");
+  }
 
   if (Serial.available() > 0) {
 
@@ -91,6 +71,12 @@ void loop() {
       
       Serial.println("option 1 chosen - 255");
       analogWrite(fadePin, 255); 
+      
+      if (appPower > 300)
+      {
+        Serial.println("Current Max Reached");
+        analogWrite(fadePin, 0); 
+      }
 
     }
     else if(inChar == '2')
