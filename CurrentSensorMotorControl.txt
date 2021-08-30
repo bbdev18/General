@@ -1,0 +1,62 @@
+Motor Control:
+
+https://www.motioncontroltips.com/faq-whats-the-relationship-between-current-and-dc-motor-output-torque/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+transistors-mosfets
+
+
+Summarize:
+https://www.youtube.com/watch?v=IG5vw6P9iY4
+https://dronebotworkshop.com/transistors-mosfets/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Circuit:
+
+If you don’t know transistors at all, they are 3 lead components that have 2 simple functions, to switch or amplify (in this example it is setup as a switch). You basically have an In called the Collector, an Out called the Emitter, and a Control called the Base. When you send a HIGH signal to the base (control pin), the transistor switches and allows current to flow from the collector (in) to the emitter (out).
+
+So we connect it so that our motor, solenoid or light is connected to V+ but not ground (V-). Ground is connected to the transistor’s collector. When our arduino sends a HIGH signal to the transistor’s base, it switches the transistor (connecting the collector and emitter) and completes the circuit for the motor, solenoid, or light.
+
+Hooking it up / What’s the diode used for?
+This circuit is pretty simple. This type of [[transistor]] is switched by [[current]] and not [[voltage]], so we need to make sure to supply the correct current to the base to switch it, so a [[resistor]] is connected from the Arduino to the base to limit the [[current]] to the proper amount.
+
+You can see that in 2 of the 3 illustrations, there is a [[diode]] parallel to the device we are powering. Any time you are powering a device with a [[coil]], such as a [[relay]], [[solenoid]], or [[motor]], you need this guy, and don’t leave home without it. What happens is when you stop powering the coil, a reverse [[voltage]], up to several hundred volts, spikes back. This only lasts a few microseconds, but it is enough to kill our transistor. So this [[diode]] (only allows current to pass one way) is normally facing the wrong direction and does nothing. But when that voltage spikes comes flowing the opposite direction, the diode allows it to flow back to the coil and not the [[transistor]]. We will need a diode fast enough to react to the kickback, and strong enough to take the load. A rectifier diode like the [[Diode Rectifier – 1A 50V |1N4001]] or SB560 should do the job. If you are looking for extra protection you could use an optoisolator between the Arduino and the transistor. An optoisolator optically isolates both sides (high and low power) of the circuit so the high-voltage can not possibly come back to the microcontroller.
+
+Just make sure that protection [[diode]] is facing the correct way (stripe facing the V+ of device). If it is facing the wrong direction, the device you are trying to power will not work as the [[diode]] will just allow the current to bypass it.
+
+Limitations
+[[Transistors]] like the [[TIP120 Darlington Transistor|TIP120]] are really great for controlling high-power devices from your [[microcontroller]], but they do have some limitations. This current configuration is only useful for switching [[DC]] current, so don’t try this with an [[AC]] source, also transistors have both a [[voltage]] and an [[amperage]]/current limitation. The TIP120 can handle switching up to 60V, and the amperage is limited to 5A, or up to 8A pulses of 300µs. I have managed to blow out one of these with a 5A load because of heat. Actually anything over a few amps, especially when the current is constant (like in a motor) and not short pulses, I would recommend using a heat-sink. I usually just solder a bent pice of metal to the back, just something to help dissipate the heat. Just note, if you are using more than one of the TIP120s, you can not solder them to the same heat-sink as the back is connected to the base of the transistor, not the emitter. If you need to switch more than 5A or AC, I would look at using a [[relay]] instead.
+
+Fade it!
+You know the [[PWM]] outputs on your Arduino? Yeah, the thing that allows you to analogWrite(pin, value). Well, [[PWM]] is not actually an [[analog]] output. The Arduino is actually pulsing (very quickly) between 0 and 5v so that the average [[voltage]] is somewhere in between 0 and 5. Because of this, the [[PWM]] can be extended through the [[transistor]] (the transistor can only turn on or off, but can do so very quickly) allowing us to fade lights or control the speed of a motor just like if they were connected directly to the Arduino. All you need to do in order to take advantage of this is make sure the [[TIP120 Darlington Transistor|TIP120]]’s base is connected to a [[PWM]] pin.
+
+
+Code
+You don’t really need code for this, you just send a HIGH signal to the base pin, and BAM… it works. But I threw this together for you so you can test it fading with the PWM- This code fades in a sin wave like the video below. (only useful for a motor or light obviously).
+PushButton:
+ You don't need a resistor and each push button just needs one wire to an input pin and one wire to ground. Wire up your button to your Uno like this:
+
+ To determine if your button is being pushed you do a standard digitalRead on the pin. The only tricky part with this is that you aren't looking for a HIGH signal like you might assume – your button will give off LOW when it's pressed. You'll also want to add a delay statement to limit the amount of reads per second you perform on the button. This keeps your code from executing over and over when your button is held down. Here's the code:
+
+ Arduino has built in pull up resistor
+ If Push button is close to board you dont need it
+
+
+Design Options:
+Shunt resistor to measure current:
+https://electronics.stackexchange.com/questions/99656/how-to-sense-current-being-used-by-motors
+
+Resources:
+http://bildr.org/2011/03/high-power-control-with-arduino-and-tip120/
+http://bildr.org/?s=High-Power+Control%3A+Arduino+%2B+mosfet
+
+Shunt:
+https://www.instructables.com/DIY-Current-Sensor-for-Arduino/
+
+Example project:
+Working project - Hall sensor + motor + arduino:
+https://www.electronicshub.org/interfacing-acs712-current-sensor-with-arduino/
+
+Current motor sensing:
+https://electronics.stackexchange.com/questions/549108/torque-control-of-dc-fan-using-arduino
