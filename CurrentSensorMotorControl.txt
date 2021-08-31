@@ -58,5 +58,8 @@ Example project:
 Working project - Hall sensor + motor + arduino:
 https://www.electronicshub.org/interfacing-acs712-current-sensor-with-arduino/
 
+Vex motor video explanation:
+https://www.youtube.com/watch?v=STdONYFI2C4
+
 Current motor sensing:
 https://electronics.stackexchange.com/questions/549108/torque-control-of-dc-fan-using-arduino
